@@ -80,6 +80,7 @@ public class Edge
 		&& this.to == other.to;
 	}
 	
+	@Override
 	public String toString ()
 	{
 		StringBuffer tmp = new StringBuffer ("Edge[from: ");

@@ -23,6 +23,9 @@ public class Graph
 	public static final int	VISIT_COLOR_GREY = 2;
 	public static final int	VISIT_COLOR_BLACK = 3; 
 	
+	public int time;
+	public boolean isCycle = false;
+	
 	// graph's data
 	private List<Vertex> 	vertices;
 	private List<Edge> 		edges;
@@ -35,6 +38,56 @@ public class Graph
 	{
 		vertices = new ArrayList <Vertex> ();
 		edges = new ArrayList <Edge> ();
+	}
+	
+	public void depthFirstSearch ()
+	{
+		time = 0;
+		for (Vertex v : vertices)
+		{
+			// unmark every vertex
+			v.setTime(-1);
+		}
+		
+		for (Vertex v : vertices)
+		{
+			if (v.visited() == false)
+			{
+				depthFirstSearch_visit (v);
+			}
+		}
+		
+		// determine what the outcome of the DFS run was
+		if (this.isCycle)
+		{
+			System.out.println("Inconsistent information.");
+		}
+		else
+		{
+			System.out.println("Print the correct output...");
+		}
+	}
+	
+	public void depthFirstSearch_visit (Vertex v)
+	{
+		time += 1;
+		v.setTime(time);
+		v.setOnPath(true);
+		
+		for (int i = 0; i < v.getOutgoingEdgesCount(); i++)
+		{
+			Vertex u = v.getOutgoingEdges().get(i).getTo();
+			if (u.visited() == false)
+			{
+				depthFirstSearch_visit(u);
+			}
+			else if (u.getOnPath())
+			{
+				this.isCycle = true;
+				break;
+			}
+		}
+		v.setOnPath(false);
 	}
 	
 	/**
@@ -60,6 +113,19 @@ public class Graph
 			ret = vertices.add(v);
 		}
 		return ret;
+	}
+	
+	/**
+	 * Adds a null Vertex to the graph.
+	 * This is primarily used for constructing a village of n people without any data
+	 * about the villagers being provided.
+	 * 
+	 * @param nullVertex The null Vertex to add 
+	 * @return true if the null Vertex was added correctly.
+	 */
+	public boolean addNullVertex (Vertex nullVertex)
+	{
+		return vertices.add(nullVertex);
 	}
 	
 	/**
@@ -111,6 +177,91 @@ public class Graph
 	public Vertex getVertex (int n)
 	{
 		return vertices.get(n);
+	}
+	
+	/**
+	 * Asks the graph for the first Vertex, that is a birth vertex,
+	 * that has a matching name. (Linear search).
+	 * 
+	 * @param id ID of the person
+	 * @return The Vertex found
+	 */
+	public Vertex getBirthVertex (int id)
+	{
+		Vertex v = null;
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			v = vertices.get(i);
+			if (v.getIsBirth() == true && v.getPersonID() == id)
+			{
+				break;
+			}
+		}
+		
+		if (v != null) return v;
+		return null;
+	}
+	
+	/**
+	 * Asks the graph if it has a birth vertex with a matching ID
+	 * @param name ID of the person
+	 * @return true if the graph has a corresponding Vertex
+	 */
+	public boolean hasBirthVertex (int name)
+	{
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			if (this.vertices.get(i).getIsBirth() == true && this.vertices.get(i).getPersonID() == name) return true; 
+		}
+		return false;
+	}
+	
+	/**
+	 * Asks the graph if it has a death vertex with a matching ID
+	 * @param name ID of the person
+	 * @return true if the graph has a corresponding Vertex
+	 */
+	public boolean hasDeathVertex (int name)
+	{
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			if (this.vertices.get(i).getIsBirth() == false && this.vertices.get(i).getPersonID() == name) return true; 
+		}
+		return false;
+	}
+	
+	/**
+	 * Asks the graph for the first Vertex, that is a death vertex,
+	 * that has a matching name. (Linear search).
+	 * 
+	 * @param id ID of the person
+	 * @return The Vertex found
+	 */
+	public Vertex getDeathVertex (int name)
+	{
+		Vertex v = null;
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			v = vertices.get(i);
+			if (v.getIsBirth() == false && v.getPersonID() == name)
+			{
+				break;
+			}
+		}
+		if (v != null) return v;
+		return null;
+	}
+	
+	/**
+	 * Utility to print every birth and death vertex in the graph
+	 */
+	public void printListOfVertices ()
+	{
+		for (Vertex v : vertices)
+		{
+			System.out.print(v.name() + ", ");
+		}
+		System.out.println("\n");
 	}
 	
 	/**
@@ -180,9 +331,10 @@ public class Graph
 		}
 	}
 	
+	@Override
 	public String toString ()
 	{
-		StringBuffer tmp = new StringBuffer("Graph[");
+		StringBuffer tmp = new StringBuffer("Graph[ \n");
 		for (Vertex v : vertices)
 		{
 			tmp.append(v);

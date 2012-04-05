@@ -24,27 +24,47 @@ public class TheMain
 {
 	public static void main(String[] args) throws IOException 
 	{
+		// data for the graph and the graph itself
 		Graph graph = new Graph();
 		int nVillagers = -1;
 		
-		
+		// counters for the input file
 		int section = 0;
 		int line = 0;
 
-		File file = new File("src/tests/open_1.txt");
+		// read the file...
+		File file = new File("src/tests/open_3.txt");
 		FileInputStream fis = new FileInputStream(file);
 		Scanner scanner = new Scanner(fis);
 		try 
 		{
 			while (scanner.hasNextLine())
 			{
+				// get the current line from the input
 				String currentLine = scanner.nextLine();
 				
 				// get the number of villagers from the first line
 				if (line == 0) 
 				{
+					// get the number of villagers
 					nVillagers = Integer.parseInt(currentLine);
-					log("Constructing " + nVillagers + " villagers.");
+					
+					//log("Constructing " + nVillagers + " villagers.");
+					//log("So a total of " + nVillagers * 2 + " vertices.\n");
+					
+					// create the birth villagers without any sort of edges
+					for (int i = 0; i < nVillagers; i++)
+					{
+						Vertex tmp = new Vertex (-1, true);
+						graph.addNullVertex(tmp);
+					}
+					
+					// create the death villagers without any sort of edges
+					for (int i = 0; i < nVillagers; i++)
+					{
+						Vertex tmp = new Vertex (-1, false);
+						graph.addNullVertex(tmp);
+					}
 				}
 
 				// increment the 'section' if a '#' has been hit
@@ -56,46 +76,60 @@ public class TheMain
 
 				// we are constructing nodes of the first type
 				else if (section == 1)
-				{
-					log("Constructing new nodes from section one.");
-					
+				{					
 					// scrape out needed info from the current line
 					String[] numStrs = currentLine.split(" ");
 					int personID01 = Integer.parseInt(numStrs[0]);
 					int personID02 = Integer.parseInt(numStrs[1]);
-					
-					// create the new vertices
-					Vertex b_left = new Vertex (personID01, true);
-					Vertex d_left = new Vertex (personID01, false);
-					Vertex b_right = new Vertex (personID02, true);
-					Vertex d_right = new Vertex (personID02, false);
-					
-					// add the vertices to the graph
-					graph.addVertex(b_left);
-					graph.addVertex(d_left);
-					graph.addVertex(b_right);
-					graph.addVertex(d_right);
+										
+					// update the new vertices in the graph
+					if (!graph.hasBirthVertex(personID01)) 
+						graph.getBirthVertex(-1).setPersonID(personID01);
+					if (!graph.hasDeathVertex(personID01)) 
+						graph.getDeathVertex(-1).setPersonID(personID01);
+					if (!graph.hasBirthVertex(personID02)) 
+						graph.getBirthVertex(-1).setPersonID(personID02);
+					if (!graph.hasDeathVertex(personID02)) 
+						graph.getDeathVertex(-1).setPersonID(personID02);
 					
 					// add the edges to the graph
-					graph.addEdge(b_left, d_left);
-					graph.addEdge(b_right, d_right);
-					graph.addEdge(d_left, b_right);
-					
+					graph.addEdge(graph.getBirthVertex(personID01), graph.getDeathVertex(personID01));
+					graph.addEdge(graph.getBirthVertex(personID02), graph.getDeathVertex(personID02));
+					graph.addEdge(graph.getDeathVertex(personID01), graph.getBirthVertex(personID02));					
 				}
 
 				// we are constructing nodes of the second type
 				else if (section == 2)
 				{
-					log("Constructing new nodes from section two.");
+					// scrape out needed info from the current line
+					String[] numStrs = currentLine.split(" ");
+					int personID01 = Integer.parseInt(numStrs[0]);
+					int personID02 = Integer.parseInt(numStrs[1]);
+					
+					// add the overlapping edges to the graph
+					graph.addEdge(graph.getBirthVertex(personID01), graph.getDeathVertex(personID02));
+					graph.addEdge(graph.getBirthVertex(personID02), graph.getDeathVertex(personID01));
 				}
 
 				line++;
+				
 			}
 		} 
 		finally 
 		{
+			if (graph.getEdges().size() > 0)
+			{
+				graph.depthFirstSearch();
+			}
+			else
+			{
+				log ("Print special case with no edges...");
+			}
+			
+			log("\n");
 			log(graph.toString());
-			log("size = " + graph.nVertices());
+			
+			// close the input
 			scanner.close();
 		}
 	}
@@ -106,7 +140,7 @@ public class TheMain
 	 * @param aMessage
 	 *            The message to print out to the console using println
 	 */
-	public static void log(String aMessage)
+	private static void log(String aMessage)
 	{
 		System.out.println(aMessage);
 	}
