@@ -16,8 +16,6 @@ public class Vertex
 	
 	private List <Edge> 	incomingEdges;
 	private List <Edge> 	outgoingEdges;
-	private boolean 		mark;
-	private int 			markState;
 	private boolean			isBirth;
 	private int				personID;
 	private int				timeStamp;
@@ -34,7 +32,6 @@ public class Vertex
 		outgoingEdges = new ArrayList <Edge> ();
 		this.personID = personID;
 		this.isBirth = 	isBirth;
-		this.mark = 	false;
 		this.timeStamp = -1;
 	}
 	
@@ -175,48 +172,6 @@ public class Vertex
 	}
 	
 	/**
-	 * Mark the Vertex as visited
-	 */
-	public void visit ()
-	{
-		mark();
-	}
-	
-	/**
-	 * Mark the Vertex
-	 */
-	public void mark()
-	{
-		this.mark = true;
-	}
-	
-	/**
-	 * Clear the Vertex's marks
-	 */
-	public void clearMark ()
-	{
-		this.mark = false;
-	}
-	
-	/**
-	 * Set the Vertex's mark state
-	 * @param state the state to set
-	 */
-	public void setMarkState (int state)
-	{
-		this.markState = state;
-	}
-	
-	/**
-	 * Asks the Vertex for its mark state
-	 * @return an index code corresponding to a mark state.
-	 */
-	public int getMarkState ()
-	{
-		return this.markState;
-	}
-	
-	/**
 	 * Asks the Vertex if it is a Birth vertex
 	 * @return true if it is a birth vertex, false otherwise.
 	 */
@@ -227,7 +182,7 @@ public class Vertex
 	
 	/**
 	 * Asks the Vertex for its person's ID number
-	 * @return Ther person's ID number
+	 * @return The person's ID number
 	 */
 	public int getPersonID ()
 	{
@@ -268,11 +223,11 @@ public class Vertex
 	{
 		if (isBirth)
 		{
-			return personID + "B";
+			return personID + " B";
 		}
 		else
 		{
-			return personID + "D";
+			return personID + " D";
 		}
 	}
 	

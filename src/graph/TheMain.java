@@ -33,7 +33,7 @@ public class TheMain
 		int line = 0;
 
 		// read the file...
-		File file = new File("src/tests/open_3.txt");
+		File file = new File("src/tests/open_5.txt");
 		FileInputStream fis = new FileInputStream(file);
 		Scanner scanner = new Scanner(fis);
 		try 
@@ -48,22 +48,18 @@ public class TheMain
 				{
 					// get the number of villagers
 					nVillagers = Integer.parseInt(currentLine);
-					
-					//log("Constructing " + nVillagers + " villagers.");
-					//log("So a total of " + nVillagers * 2 + " vertices.\n");
-					
-					// create the birth villagers without any sort of edges
-					for (int i = 0; i < nVillagers; i++)
+										
+					// create the villagers and add an edge
+					// between every villager i_b and i_d
+					for (int i = 1; i <= nVillagers; i++)
 					{
-						Vertex tmp = new Vertex (-1, true);
-						graph.addNullVertex(tmp);
-					}
-					
-					// create the death villagers without any sort of edges
-					for (int i = 0; i < nVillagers; i++)
-					{
-						Vertex tmp = new Vertex (-1, false);
-						graph.addNullVertex(tmp);
+						Vertex b_tmp = new Vertex (i, true);
+						Vertex d_tmp = new Vertex (i, false);						
+						graph.addNullVertex(b_tmp);
+						graph.addNullVertex(d_tmp);
+						graph.addEdge(
+								graph.getBirthVertex(i),
+								graph.getDeathVertex(i));
 					}
 				}
 
@@ -81,21 +77,10 @@ public class TheMain
 					String[] numStrs = currentLine.split(" ");
 					int personID01 = Integer.parseInt(numStrs[0]);
 					int personID02 = Integer.parseInt(numStrs[1]);
-										
-					// update the new vertices in the graph
-					if (!graph.hasBirthVertex(personID01)) 
-						graph.getBirthVertex(-1).setPersonID(personID01);
-					if (!graph.hasDeathVertex(personID01)) 
-						graph.getDeathVertex(-1).setPersonID(personID01);
-					if (!graph.hasBirthVertex(personID02)) 
-						graph.getBirthVertex(-1).setPersonID(personID02);
-					if (!graph.hasDeathVertex(personID02)) 
-						graph.getDeathVertex(-1).setPersonID(personID02);
+										 
+					// construct the edge from 1_d --> 2_b based on the input
+					graph.addEdge(graph.getDeathVertex(personID01), graph.getBirthVertex(personID02));
 					
-					// add the edges to the graph
-					graph.addEdge(graph.getBirthVertex(personID01), graph.getDeathVertex(personID01));
-					graph.addEdge(graph.getBirthVertex(personID02), graph.getDeathVertex(personID02));
-					graph.addEdge(graph.getDeathVertex(personID01), graph.getBirthVertex(personID02));					
 				}
 
 				// we are constructing nodes of the second type
@@ -117,31 +102,11 @@ public class TheMain
 		} 
 		finally 
 		{
-			if (graph.getEdges().size() > 0)
-			{
-				graph.depthFirstSearch();
-			}
-			else
-			{
-				log ("Print special case with no edges...");
-			}
-			
-			log("\n");
-			log(graph.toString());
-			
+			// perform the search...
+			graph.depthFirstSearch();
+						
 			// close the input
 			scanner.close();
 		}
-	}
-
-	/**
-	 * A helper function for printing lines. Solely made to reduce keystrokes.
-	 * 
-	 * @param aMessage
-	 *            The message to print out to the console using println
-	 */
-	private static void log(String aMessage)
-	{
-		System.out.println(aMessage);
 	}
 }

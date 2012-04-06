@@ -14,9 +14,7 @@ public class Edge
 	
 	// the Vertex the edge is going to.
 	private Vertex 		to;
-	
-	private boolean 	mark;
-		
+			
 	public Edge (Vertex from, Vertex to)
 	{
 		this.from = from;
@@ -39,31 +37,6 @@ public class Edge
 	public Vertex getFrom ()
 	{
 		return from;
-	}
-	
-	/**
-	 * Marks the Edge
-	 */
-	public void mark ()
-	{
-		mark = true;
-	}
-	
-	/**
-	 * Clears the Edge's mark
-	 */
-	public void clearMark ()
-	{
-		mark = false;
-	}
-	
-	/**
-	 * Asks the Edge if it is marked.
-	 * @return true if the edge is marked.
-	 */
-	public boolean isMarked ()
-	{
-		return this.mark;
 	}
 	
 	@Override

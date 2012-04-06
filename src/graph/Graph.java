@@ -2,6 +2,7 @@ package graph;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * The graph represents the timeline of the village.
@@ -21,14 +22,17 @@ public class Graph
 	// visit colors of the nodes for different states
 	public static final int	VISIT_COLOR_WHITE = 1;
 	public static final int	VISIT_COLOR_GREY = 2;
-	public static final int	VISIT_COLOR_BLACK = 3; 
+	public static final int	VISIT_COLOR_BLACK = 3;
 	
+	// properties used by the graph
+	public int startYear = 1800;
 	public int time;
 	public boolean isCycle = false;
-	
+		
 	// graph's data
 	private List<Vertex> 	vertices;
 	private List<Edge> 		edges;
+	private Stack<Vertex>	verticesToPrint;
 	private Vertex 			rootVertex;
 	
 	/**
@@ -38,8 +42,12 @@ public class Graph
 	{
 		vertices = new ArrayList <Vertex> ();
 		edges = new ArrayList <Edge> ();
+		verticesToPrint = new Stack <Vertex> ();
 	}
 	
+	/**
+	 * Performs the depth first search on the graph
+	 */
 	public void depthFirstSearch ()
 	{
 		time = 0;
@@ -64,10 +72,18 @@ public class Graph
 		}
 		else
 		{
-			System.out.println("Print the correct output...");
+			this.printTimeline();
 		}
 	}
 	
+	/**
+	 * Performs the visit of the DFS on the Vertex v
+	 * Marks v as has been visited and tells it 
+	 * to run DFS on its adjacency list.
+	 * 
+	 * @param v The Vertex to be marked as visited and
+	 * to have DFS ran on its adjacency lists
+	 */
 	public void depthFirstSearch_visit (Vertex v)
 	{
 		time += 1;
@@ -87,7 +103,27 @@ public class Graph
 				break;
 			}
 		}
+		verticesToPrint.push(v);
 		v.setOnPath(false);
+	}
+	
+	/**
+	 * Helper function to print the timeline
+	 * if there is no cycle found in the 
+	 * DFS run of the graph.
+	 */
+	private void printTimeline ()
+	{
+		StringBuffer sb = new StringBuffer ();
+		sb.append("(");
+		int size = verticesToPrint.size();
+		for (int i = 0; i < size; i++)
+		{
+			Vertex v = verticesToPrint.pop();
+			sb.append("(" + v.name() + " " + (startYear++) + ")");
+		}
+		sb.append(")");
+		System.out.println(sb.toString());
 	}
 	
 	/**
@@ -309,27 +345,6 @@ public class Graph
 		}
 	}
 	
-	/**
-	 * Clear the mark state of all vertices in the graph
-	 */
-	public void clearMark ()
-	{
-		for (Vertex v : vertices)
-		{
-			v.clearMark();
-		}
-	}
-	
-	/**
-	 * Clear the mark state of all edges in the graph
-	 */
-	public void clearEdges ()
-	{
-		for (Edge e : edges)
-		{
-			e.clearMark();
-		}
-	}
 	
 	@Override
 	public String toString ()
